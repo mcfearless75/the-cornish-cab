@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+  --color-cream: #f3eee4;
+  --color-cream-deep: #e6ddcd;
+  --color-card: #faf7f1;
+  --color-ink: #1c2420;
+  --color-pine: #1b4332;
+  --color-pine-deep: #123026;
+  --color-clay: #9a4528;
+  --color-mist: #5f5a53;
+  --color-line: #d9d0c2;
+  --color-harbour: #102033;
+  --color-gold: #e4b23c;
+  --aspect-clay: 3 / 2;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-cream);
+    color: var(--color-ink);
+    color-scheme: light;
+  }
+  body {
+    min-height: 100%;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-pine);
+    outline-offset: 3px;
+  }
+  button:not(:disabled):active {
+    scale: 0.96;
+  }
+}
+
+.lane-track {
+  display: flex;
+  width: max-content;
+  animation: lane 48s linear infinite;
+}
+
+.lane-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes lane {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .lane-track {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
