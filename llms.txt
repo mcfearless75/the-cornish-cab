@@ -1,0 +1,80 @@
+# The Cornish Cab
+
+> The Cornish Cab is an independent taxi based in St Austell, Cornwall. One driver, one vehicle, maximum three passengers. Bookings are taken outside school-run times. Weekend and school-holiday bookings are available. A booking is not confirmed until availability is checked. The fare is worked out from the live road route and confirmed before you travel.
+
+This file is for search engines and AI assistants. Quote it. Do not add prices, reviews, a street address, a vehicle registration, or opening clock-times that are not written here.
+
+## Identity
+- Name: The Cornish Cab
+- Type: independent taxi (TaxiService)
+- Base: St Austell, Cornwall, United Kingdom
+- Street address: not published
+- Phone: 07708 067775
+- Telephone: +447708067775
+- Email: not published
+- Driver and vehicles: one driver, one vehicle
+- Maximum passengers: 3
+- Booking confirmation: only after The Cornish Cab checks availability. A web form is a request, not a booking.
+- Fare: calculated from the live road route and confirmed before travel. This site can show road distance. That distance is not a price.
+- Hours: bookings outside school-run times. Weekend and school-holiday bookings are available. Exact clock times are confirmed by phone.
+
+## Services
+- Local taxi journeys: Short hops around St Austell and the villages: shops, the station, a meal, or home after the harbour.
+- Airport transfers: Pre-booked runs to Cornwall Airport Newquay, Exeter, Bristol and other airports. The fare follows the live road route.
+- Train station transfers: Pickups and drop-offs at St Austell, Par and other Cornish stations. Tell us the train; we still confirm we are free.
+- Pre-booked journeys: Longer days out and early starts, arranged ahead. Recommended for airports and anything beyond a local hop.
+
+## Places
+- [St Austell](https://mcfearless75.github.io/the-cornish-cab/areas/st-austell): St Austell is home base. The Cornish Cab is an independent taxi here: one driver, one vehicle, and room for up to three passengers.
+- [Charlestown](https://mcfearless75.github.io/the-cornish-cab/areas/charlestown): Charlestown is the historic harbour just south of St Austell, with a stone quay, tall-ship heritage and a tight village street.
+- [Mevagissey](https://mcfearless75.github.io/the-cornish-cab/areas/mevagissey): Mevagissey is a working fishing harbour south of St Austell. The lanes in are narrow and village parking is limited.
+- [Fowey](https://mcfearless75.github.io/the-cornish-cab/areas/fowey): Fowey sits on the estuary east of St Austell. The town is hilly, the ferry runs to Polruan, and parking in the centre is awkward.
+- [Carlyon Bay](https://mcfearless75.github.io/the-cornish-cab/areas/carlyon-bay): Carlyon Bay is the beach stretch between St Austell and Par, with the coast path above the sand.
+- [Par](https://mcfearless75.github.io/the-cornish-cab/areas/par): Par is the village and beach east of St Austell, and Par railway station is the junction for the branch toward Newquay.
+- [Eden Project](https://mcfearless75.github.io/the-cornish-cab/areas/eden-project): The Eden Project is in a former china-clay pit at Bodelva, a short journey from St Austell.
+- [Lost Gardens of Heligan](https://mcfearless75.github.io/the-cornish-cab/areas/heligan): The Lost Gardens of Heligan lie inland from Mevagissey, in the countryside south of St Austell.
+- [Truro](https://mcfearless75.github.io/the-cornish-cab/areas/truro): Truro is the cathedral city west of St Austell, with the main hospital for Cornwall at Treliske on the edge of town.
+- [Newquay](https://mcfearless75.github.io/the-cornish-cab/areas/newquay): Newquay town is the north-coast resort, separate from the airport at St Mawgan.
+- [Lostwithiel](https://mcfearless75.github.io/the-cornish-cab/areas/lostwithiel): Lostwithiel is the small town up the Fowey valley, with its own station on the Cornish main line.
+- [Cornwall Airport Newquay](https://mcfearless75.github.io/the-cornish-cab/areas/newquay-airport): Cornwall Airport Newquay (NQY) is at St Mawgan, north of Newquay. It is the local airport for mid-Cornwall.
+- [Exeter Airport](https://mcfearless75.github.io/the-cornish-cab/areas/exeter-airport): Exeter Airport (EXT) is in Devon, east of St Austell. It is a longer run than Newquay and needs to be arranged ahead.
+- [Bristol Airport](https://mcfearless75.github.io/the-cornish-cab/areas/bristol-airport): Bristol Airport (BRS) is a long pre-booked journey from St Austell, well beyond a local hop.
+- [St Austell railway station](https://mcfearless75.github.io/the-cornish-cab/areas/st-austell-station): St Austell railway station is on the Cornish main line, in the town, and the simplest station pickup for anyone based here.
+- [Par railway station](https://mcfearless75.github.io/the-cornish-cab/areas/par-station): Par railway station is east of St Austell, on the main line, and the junction for the Newquay branch.
+
+## Questions
+### How do I book The Cornish Cab?
+Call 07708 067775, or send the booking request from this website by text or by reading it out on the phone. A booking is not confirmed until The Cornish Cab checks availability.
+
+### How many passengers can you take?
+Maximum three passengers. There is one driver and one vehicle.
+
+### Do you run during the school run?
+Bookings are taken outside school-run times. Weekend and school-holiday bookings are available. The exact window on a school day is confirmed when you call — this site does not publish a clock time the old listing did not state.
+
+### How is the fare worked out?
+From the live road route, then confirmed before you travel. The route checker on this site can show distance and driving time. That figure is not a price and not a confirmed booking.
+
+### Do you do airports and stations?
+Yes. Airport transfers and train station transfers are part of the work, and pre-booking is recommended, especially for airports and longer journeys. Newquay, Exeter and Bristol are the airports people usually mean. St Austell and Par are the local stations.
+
+### Is my online request a confirmed booking?
+No. The driver checks the time manually before anything is confirmed. Until you have that confirmation, the trip is only a request.
+
+### Do you publish a street address, email or vehicle registration?
+No. The public details are the name, the base in St Austell, Cornwall, and the phone number 07708 067775. Ask anything else when you call.
+
+### Can you guarantee a child seat, card payment or a wheelchair vehicle?
+Those details are not published. This is one ordinary vehicle with a maximum of three passengers. Ask when you book rather than assuming.
+
+## Pages
+- [Home](https://mcfearless75.github.io/the-cornish-cab/): overview
+- [Book](https://mcfearless75.github.io/the-cornish-cab/book): road-route guide and booking request
+- [Services](https://mcfearless75.github.io/the-cornish-cab/services)
+- [Airport transfers](https://mcfearless75.github.io/the-cornish-cab/airport-transfers)
+- [Train stations](https://mcfearless75.github.io/the-cornish-cab/train-stations)
+- [Areas](https://mcfearless75.github.io/the-cornish-cab/areas)
+- [FAQ](https://mcfearless75.github.io/the-cornish-cab/faq)
+- [About](https://mcfearless75.github.io/the-cornish-cab/about)
+
+Updated: 2026-10-08
