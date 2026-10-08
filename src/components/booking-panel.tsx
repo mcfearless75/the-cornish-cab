@@ -1,3 +1,4 @@
+import { RouteSketch } from "@/components/route-sketch";
 import { BUSINESS, quickJourneys } from "@/lib/content";
 import { roadRoute } from "@/lib/road-route";
 import { routeGuide } from "@/lib/route.functions";
@@ -9,7 +10,31 @@ type RouteResult = {
   minutes: number;
   fromLabel: string;
   toLabel: string;
+  line: [number, number][];
 };
+
+type SavedJourney = { from: string; to: string };
+
+const STORE = "cornish-cab-journeys";
+const noteChips = ["One suitcase", "A train to meet", "A flight number"];
+
+function readSaved(): SavedJourney[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORE) || "[]") as unknown;
+    if (!Array.isArray(raw)) return [];
+    return raw
+      .filter(
+        (item): item is SavedJourney =>
+          !!item &&
+          typeof item === "object" &&
+          typeof (item as SavedJourney).from === "string" &&
+          typeof (item as SavedJourney).to === "string",
+      )
+      .slice(0, 4);
+  } catch {
+    return [];
+  }
+}
 
 export function BookingPanel({
   initialFrom = "",
@@ -30,6 +55,9 @@ export function BookingPanel({
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
   const [route, setRoute] = useState<RouteResult | null>(null);
+  const [back, setBack] = useState<RouteResult | null>(null);
+  const [returning, setReturning] = useState(false);
+  const [saved, setSaved] = useState<SavedJourney[]>([]);
   const [routeError, setRouteError] = useState("");
   const [checking, setChecking] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -37,6 +65,7 @@ export function BookingPanel({
 
   useEffect(() => {
     setLive(true);
+    setSaved(readSaved());
   }, []);
 
   useEffect(() => {
@@ -59,7 +88,10 @@ export function BookingPanel({
     name.trim() ? `Name: ${name.trim()}` : "",
     notes.trim() ? `Notes: ${notes.trim()}` : "",
     route
-      ? `Road route guide: about ${route.miles} miles, about ${route.minutes} minutes. Not a fare. Traffic not included.`
+      ? `Out: about ${route.miles} miles, about ${route.minutes} minutes. Not a fare. Traffic not included.`
+      : "",
+    back
+      ? `Return: about ${back.miles} miles, about ${back.minutes} minutes. Same rule. Not a fare.`
       : "",
     "Please confirm availability and the fare from the live road route.",
     "This message is not a confirmed booking.",
@@ -67,20 +99,93 @@ export function BookingPanel({
     .filter(Boolean)
     .join("\n");
 
+  async function lookup(pickup: string, drop: string) {
+    return import.meta.env.VITE_PAGES === "1"
+      ? roadRoute(pickup, drop)
+      : routeGuide({ data: { from: pickup, to: drop } });
+  }
+
+  function remember(pickup: string, drop: string) {
+    const next = [{ from: pickup, to: drop }, ...readSaved().filter((item) => item.from !== pickup || item.to !== drop)].slice(0, 4);
+    localStorage.setItem(STORE, JSON.stringify(next));
+    setSaved(next);
+  }
+
   async function checkRoute() {
     setRouteError("");
     setRoute(null);
+    setBack(null);
     setChecking(true);
     try {
-      const result =
-        import.meta.env.VITE_PAGES === "1" ? await roadRoute(from, to) : await routeGuide({ data: { from, to } });
-      if (!result.ok) setRouteError(result.error);
-      else setRoute(result);
+      const result = await lookup(from, to);
+      if (!result.ok) {
+        setRouteError(result.error);
+        return;
+      }
+      setRoute(result);
+      remember(from.trim(), to.trim());
+      if (returning) {
+        const home = await lookup(to, from);
+        if (home.ok) setBack(home);
+        else setRouteError(`Outward route is above. The return could not be measured: ${home.error}`);
+      }
     } catch (error) {
       setRouteError(error instanceof Error ? error.message : "The route check failed.");
     } finally {
       setChecking(false);
     }
+  }
+
+  function swapEnds() {
+    setFrom(to);
+    setTo(from);
+    setRoute(null);
+    setBack(null);
+  }
+
+  function addNote(chip: string) {
+    setNotes((current) => (current.includes(chip) ? current : current ? `${current}. ${chip}` : chip));
+  }
+
+  function saveCalendar() {
+    if (asap || !when) return;
+    const start = new Date(when);
+    if (Number.isNaN(start.getTime())) return;
+    const end = new Date(start.getTime() + (route?.minutes ?? 30) * 60_000);
+    const stamp = (date: Date) => {
+      const part = (value: number) => String(value).padStart(2, "0");
+      return `${date.getFullYear()}${part(date.getMonth() + 1)}${part(date.getDate())}T${part(date.getHours())}${part(date.getMinutes())}00`;
+    };
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//The Cornish Cab//Request//EN",
+      "BEGIN:VEVENT",
+      `DTSTART;TZID=Europe/London:${stamp(start)}`,
+      `DTEND;TZID=Europe/London:${stamp(end)}`,
+      "SUMMARY:Requested taxi — not confirmed",
+      `DESCRIPTION:${message.replace(/\n/g, "\\n")}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "cornish-cab-request.ics";
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function shareMessage() {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "The Cornish Cab request", text: message });
+        return;
+      } catch {
+        return;
+      }
+    }
+    await copyMessage();
   }
 
   async function copyMessage() {
@@ -117,6 +222,24 @@ export function BookingPanel({
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2">
+        {saved.length > 0 ? (
+          <p className="w-full text-xs font-medium text-mist">On this phone</p>
+        ) : null}
+        {saved.map((journey) => (
+          <button
+            key={`${journey.from}-${journey.to}`}
+            type="button"
+            className="rounded-full border border-pine bg-cream px-3 py-2 text-left text-xs font-medium text-ink"
+            onClick={() => {
+              setFrom(journey.from);
+              setTo(journey.to);
+              setRoute(null);
+              setBack(null);
+            }}
+          >
+            {journey.from} → {journey.to}
+          </button>
+        ))}
         {quickJourneys.map((j) => (
           <button
             key={`${j.from}-${j.to}`}
@@ -126,6 +249,7 @@ export function BookingPanel({
               setFrom(j.from);
               setTo(j.to);
               setRoute(null);
+              setBack(null);
             }}
           >
             {j.from} → {j.to}
@@ -206,6 +330,18 @@ export function BookingPanel({
             ))}
           </div>
           <p className="mt-2 text-xs text-mist">Maximum 3. One vehicle.</p>
+          <label className="mt-3 flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={returning}
+              onChange={(event) => {
+                setReturning(event.target.checked);
+                setBack(null);
+              }}
+              className="size-4 accent-pine"
+            />
+            Coming back the same day
+          </label>
         </fieldset>
         <label className="grid gap-1.5 text-sm font-medium">
           Name <span className="font-normal text-mist">(optional)</span>
@@ -224,6 +360,18 @@ export function BookingPanel({
             rows={3}
             className="rounded-xl border border-line bg-cream px-3 py-3 font-normal text-ink"
           />
+          <span className="flex flex-wrap gap-2 font-normal">
+            {noteChips.map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                onClick={() => addNote(chip)}
+                className="rounded-full border border-line bg-cream px-3 py-1 text-xs text-ink"
+              >
+                {chip}
+              </button>
+            ))}
+          </span>
         </label>
       </div>
 
@@ -235,6 +383,13 @@ export function BookingPanel({
           className="inline-flex h-12 items-center rounded-full bg-clay px-5 text-sm font-medium text-cream disabled:opacity-60"
         >
           {checking ? "Checking the road…" : "Check road route"}
+        </button>
+        <button
+          type="button"
+          onClick={swapEnds}
+          className="inline-flex h-12 items-center rounded-full border border-line bg-cream px-5 text-sm font-medium text-ink"
+        >
+          Swap ends
         </button>
         <a
           href={`tel:${BUSINESS.phoneTel}`}
@@ -248,10 +403,26 @@ export function BookingPanel({
         >
           Text this request
         </a>
+        {!asap && when ? (
+          <button
+            type="button"
+            onClick={saveCalendar}
+            className="inline-flex h-12 items-center rounded-full border border-line bg-cream px-5 text-sm font-medium text-ink"
+          >
+            Save the time
+          </button>
+        ) : null}
+        <button
+          type="button"
+          onClick={shareMessage}
+          className="inline-flex h-12 items-center rounded-full border border-line bg-cream px-5 text-sm font-medium text-ink"
+        >
+          Share
+        </button>
       </div>
       <p className="mt-3 text-xs leading-relaxed text-mist">
-        Route check uses OpenStreetMap to measure driving distance. It is not a booking and not a fare.
-        Nothing is stored on this website.
+        Route check uses OpenStreetMap to measure driving distance. The saved journeys stay on this phone.
+        It is not a booking and not a fare.
       </p>
 
       {routeError ? (
@@ -268,10 +439,17 @@ export function BookingPanel({
             <span className="mx-2 text-cream/50">·</span>
             about {route.minutes} min
           </p>
+          {back ? (
+            <p className="mt-1 font-display text-xl tabular-nums text-gold">
+              Back: {back.miles} miles · about {back.minutes} min
+            </p>
+          ) : null}
           <p className="mt-2 text-sm leading-relaxed text-cream/85">
             {route.fromLabel} to {route.toLabel}. Traffic is not included. Call to turn this into a confirmed
             fare and a confirmed time.
           </p>
+          <RouteSketch line={route.line} />
+          <p className="mt-2 text-xs text-cream/70">Cream dot is the pickup. Clay dot is the drop. Not a satnav.</p>
         </div>
       ) : null}
 

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { readOsrm } from "@/lib/road-route";
 import { getRequestIP } from "@tanstack/react-start/server";
 
 type Hit = { lat: number; lon: number; label: string };
@@ -94,30 +95,11 @@ export const routeGuide = createServerFn({ method: "POST" })
       };
     }
 
-    const url = `https://router.project-osrm.org/route/v1/driving/${fromHit.lon},${fromHit.lat};${toHit.lon},${toHit.lat}?overview=false`;
+    const url = `https://router.project-osrm.org/route/v1/driving/${fromHit.lon},${fromHit.lat};${toHit.lon},${toHit.lat}?overview=simplified&geometries=geojson`;
     const res = await fetch(url, { headers: { Accept: "application/json" } });
     if (!res.ok) {
       return { ok: false as const, error: "The road router is busy. Call 07708 067775 for the fare." };
     }
-    const body = (await res.json()) as {
-      code?: string;
-      routes?: { distance?: number; duration?: number }[];
-    };
-    const route = body.routes?.[0];
-    if (body.code !== "Ok" || !route?.distance || !route.duration) {
-      return {
-        ok: false as const,
-        error: "No driving route came back. Call 07708 067775 and the driver will use the live road route.",
-      };
-    }
-
-    const miles = Math.round((route.distance / 1609.344) * 10) / 10;
-    const minutes = Math.max(1, Math.round(route.duration / 60));
-    return {
-      ok: true as const,
-      miles,
-      minutes,
-      fromLabel: fromHit.label,
-      toLabel: toHit.label,
-    };
+    const body = (await res.json()) as Parameters<typeof readOsrm>[0];
+    return readOsrm(body, fromHit.label, toHit.label);
   });
