@@ -89,7 +89,7 @@ export const askCab = createServerFn({ method: "POST" })
               "Never say a journey is booked or confirmed. Confirmation happens only after an availability check.",
               "Road distance is not a fare. This chat cannot quote a guaranteed fare.",
               "If the question is not about this taxi, say so in one sentence and point back to booking.",
-              "When a trip is being discussed, end by inviting a call to 07708 067775.",
+              "When a trip is being discussed, end by inviting a WhatsApp message to 07708 067775. Do not say the journey is booked.",
               "",
               "FACTS:",
               factsBrief(),

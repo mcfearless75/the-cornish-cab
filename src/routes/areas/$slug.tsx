@@ -1,6 +1,6 @@
 import { SiteShell } from "@/components/site-shell";
 import { publicUrl } from "@/lib/public-url";
-import { placeBySlug } from "@/lib/content";
+import { placeBySlug, whatsappHref } from "@/lib/content";
 import { breadcrumb, originFromMatches, placeSchema, seoHead } from "@/lib/seo";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
@@ -84,10 +84,12 @@ function PlacePage() {
             Request this journey
           </Link>
           <a
-            href="tel:+447708067775"
+            href={whatsappHref(`Hello, I would like a taxi to ${place.name}. This is not a confirmed booking.`)}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex h-12 items-center rounded-full border border-line bg-card px-5 text-sm font-medium"
           >
-            Call 07708 067775
+            WhatsApp about {place.name}
           </a>
         </div>
       </article>

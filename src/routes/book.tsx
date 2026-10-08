@@ -42,7 +42,7 @@ function BookPage() {
         <p className="text-sm font-medium text-clay">Booking</p>
         <h1 className="mt-2 max-w-3xl text-5xl text-ink">Get the road route, then get a yes.</h1>
         <p className="mt-4 max-w-2xl leading-relaxed text-mist">
-          Fill in the journey and check the driving distance. Call or text the summary to 07708 067775.
+          Fill in the journey and check the driving distance. Send the summary on WhatsApp to 07708 067775.
           The Cornish Cab works the fare from the live road route and only confirms the job if the time is free.
         </p>
         <div className="mt-8">

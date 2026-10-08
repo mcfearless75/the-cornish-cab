@@ -10,6 +10,13 @@ export const BUSINESS = {
     "The Cornish Cab is an independent taxi based in St Austell, Cornwall. One driver, one vehicle, maximum three passengers. Bookings are taken outside school-run times. Weekend and school-holiday bookings are available. A booking is not confirmed until availability is checked. The fare is worked out from the live road route and confirmed before you travel.",
 } as const;
 
+export function whatsappHref(text?: string) {
+  const base = "https://wa.me/447708067775";
+  const body = text?.trim();
+  if (!body) return base;
+  return `${base}?text=${encodeURIComponent(body.slice(0, 1500))}`;
+}
+
 export const services = [
   {
     slug: "local",
@@ -237,7 +244,7 @@ export const quickJourneys = [
 export const faqs = [
   {
     q: "How do I book The Cornish Cab?",
-    a: "Call 07708 067775, or send the booking request from this website by text or by reading it out on the phone. A booking is not confirmed until The Cornish Cab checks availability.",
+    a: "Send the journey on WhatsApp to 07708 067775 from the booking page. A booking is not confirmed until The Cornish Cab checks availability.",
   },
   {
     q: "How many passengers can you take?",
@@ -291,7 +298,7 @@ export function factsBrief(): string {
   const faqLines = faqs.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n");
   return [
     BUSINESS.description,
-    `Phone: ${BUSINESS.phoneDisplay} (${BUSINESS.phoneTel}).`,
+    `Phone and WhatsApp: ${BUSINESS.phoneDisplay} (${BUSINESS.phoneTel}). Bookings and enquiries are taken on WhatsApp.`,
     "Services: " + services.map((s) => `${s.name} — ${s.summary}`).join(" "),
     "Places:\n" + placeLines,
     "FAQ:\n" + faqLines,

@@ -1,7 +1,7 @@
-import { BUSINESS } from "@/lib/content";
+import { BUSINESS, whatsappHref } from "@/lib/content";
 import { publicUrl } from "@/lib/public-url";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, Phone, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 const NAV = [
@@ -57,12 +57,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </nav>
           <div className="flex items-center gap-2">
             <a
-              href={`tel:${BUSINESS.phoneTel}`}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-gold px-4 text-sm font-semibold text-harbour"
+              href={whatsappHref("Hello, I would like to book The Cornish Cab.")}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex h-11 items-center rounded-full bg-gold px-4 text-sm font-semibold text-harbour"
             >
-              <Phone className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">{BUSINESS.phoneDisplay}</span>
-              <span className="sm:hidden">Call</span>
+              WhatsApp
             </a>
             <button
               type="button"
@@ -108,8 +108,8 @@ export function SiteShell({ children }: { children: ReactNode }) {
               <br />
               St Austell, Cornwall
               <br />
-              <a className="text-cream underline decoration-clay underline-offset-4" href={`tel:${BUSINESS.phoneTel}`}>
-                {BUSINESS.phoneDisplay}
+              <a className="text-cream underline decoration-clay underline-offset-4" href={whatsappHref()}>
+                WhatsApp {BUSINESS.phoneDisplay}
               </a>
             </address>
           </div>

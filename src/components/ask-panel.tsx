@@ -1,4 +1,4 @@
-import { BUSINESS, faqs } from "@/lib/content";
+import { BUSINESS, faqs, whatsappHref } from "@/lib/content";
 import { askCab } from "@/lib/ask.functions";
 import { useEffect, useState } from "react";
 
@@ -16,11 +16,11 @@ function pagesAnswer(question: string): string {
     const words = faq.q.toLowerCase().split(/\W+/).filter((word) => word.length > 4);
     return words.some((word) => q.includes(word));
   });
-  if (hit) return `${hit.a} Call ${BUSINESS.phoneDisplay} to book.`;
+  if (hit) return `${hit.a} WhatsApp ${BUSINESS.phoneDisplay} to book. Nothing is confirmed until the driver replies.`;
   if (/fare|price|cost|how much/.test(q)) {
-    return `There is no fixed fare on this site. The driver prices the live road route and confirms it before you travel. Call ${BUSINESS.phoneDisplay}.`;
+    return `There is no fixed fare on this site. The driver prices the live road route and confirms it on WhatsApp before you travel. Message ${BUSINESS.phoneDisplay}.`;
   }
-  return `${BUSINESS.description} Call ${BUSINESS.phoneDisplay}.`;
+  return `${BUSINESS.description} WhatsApp ${BUSINESS.phoneDisplay}.`;
 }
 
 type Turn = { role: "user" | "assistant"; content: string };
@@ -65,10 +65,10 @@ export function AskPanel() {
 
   return (
     <section className="rounded-3xl border border-line bg-card p-5 sm:p-7">
-      <h2 className="text-3xl text-ink">Ask the cab. Then ring it.</h2>
+      <h2 className="text-3xl text-ink">Ask the cab. Then WhatsApp it.</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-mist">
         It only knows what this site says. It will not invent a fare or pretend you are booked.
-        When you want the seat, call {BUSINESS.phoneDisplay}.
+        Enquiries go to {BUSINESS.phoneDisplay} on WhatsApp.
         {import.meta.env.VITE_PAGES === "1"
           ? " On this copy it answers from the published questions, not a live model."
           : ""}
@@ -133,6 +133,21 @@ export function AskPanel() {
           Ask
         </button>
       </form>
+      <a
+        href={whatsappHref(
+          turns.some((turn) => turn.role === "user")
+            ? `The Cornish Cab — enquiry\n${turns
+                .filter((turn) => turn.role === "user")
+                .map((turn) => turn.content)
+                .join("\n")}\nThis message is not a confirmed booking.`
+            : "Hello, I have a question for The Cornish Cab.",
+        )}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-4 inline-flex h-12 items-center justify-center self-start rounded-full bg-gold px-5 text-sm font-semibold text-harbour"
+      >
+        Send this enquiry on WhatsApp
+      </a>
         </>
       ) : null}
     </section>

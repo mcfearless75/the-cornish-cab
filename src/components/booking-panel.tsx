@@ -1,5 +1,5 @@
 import { RouteSketch } from "@/components/route-sketch";
-import { BUSINESS, quickJourneys } from "@/lib/content";
+import { BUSINESS, quickJourneys, whatsappHref } from "@/lib/content";
 import { roadRoute } from "@/lib/road-route";
 import { routeGuide } from "@/lib/route.functions";
 import { Link } from "@tanstack/react-router";
@@ -209,14 +209,14 @@ export function BookingPanel({
     );
   }
 
-  const sms = `sms:${BUSINESS.phoneTel}?body=${encodeURIComponent(message)}`;
+  const whatsapp = whatsappHref(message);
 
   return (
     <section className="rounded-3xl border border-line bg-card p-5 shadow-sm sm:p-7">
       <div>
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          Check the road distance, then call or text. The number you get is not a price. The Cornish Cab
+          Check the road distance, then send it on WhatsApp. The number you get is not a price. The Cornish Cab
           confirms the fare and whether the time is free.
         </p>
       </div>
@@ -392,16 +392,18 @@ export function BookingPanel({
           Swap ends
         </button>
         <a
-          href={`tel:${BUSINESS.phoneTel}`}
+          href={whatsapp}
+          target="_blank"
+          rel="noreferrer"
           className="inline-flex h-12 items-center rounded-full bg-pine px-5 text-sm font-medium text-cream"
         >
-          Call {BUSINESS.phoneDisplay}
+          Send on WhatsApp
         </a>
         <a
-          href={sms}
+          href={`tel:${BUSINESS.phoneTel}`}
           className="inline-flex h-12 items-center rounded-full border border-line bg-cream px-5 text-sm font-medium text-ink"
         >
-          Text this request
+          Call {BUSINESS.phoneDisplay}
         </a>
         {!asap && when ? (
           <button

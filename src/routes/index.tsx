@@ -1,11 +1,10 @@
 import { AskPanel } from "@/components/ask-panel";
 import { BookingPanel } from "@/components/booking-panel";
 import { SiteShell } from "@/components/site-shell";
-import { BUSINESS, places, services } from "@/lib/content";
+import { BUSINESS, places, services, whatsappHref } from "@/lib/content";
 import { publicUrl } from "@/lib/public-url";
 import { breadcrumb, originFromMatches, seoHead, taxiGraph } from "@/lib/seo";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Phone } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: ({ matches }) => {
@@ -59,12 +58,12 @@ function Home() {
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-cream/85">{BUSINESS.description}</p>
           <a
-            href={`tel:${BUSINESS.phoneTel}`}
+            href={whatsappHref("Hello, I would like to book The Cornish Cab.")}
+            target="_blank"
+            rel="noreferrer"
             className="mt-6 flex h-16 items-center justify-center gap-3 rounded-full border-2 border-gold px-5 text-cream"
           >
-            <Phone className="size-5 text-gold" aria-hidden="true" />
-            <span className="font-display text-2xl tracking-wide">{BUSINESS.phoneDisplay}</span>
-            <span className="text-sm font-medium text-gold">Call</span>
+            <span className="font-display text-2xl tracking-wide">WhatsApp {BUSINESS.phoneDisplay}</span>
           </a>
           <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {marks.map(([title, line]) => (
