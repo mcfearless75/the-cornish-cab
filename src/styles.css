@@ -67,12 +67,28 @@
   }
 }
 
+.harbour-still {
+  transform: scale(1.06);
+  animation: harbour-drift 28s ease-in-out infinite alternate;
+}
+
+@keyframes harbour-drift {
+  from {
+    transform: scale(1.06) translate3d(1.2%, 0, 0);
+  }
+  to {
+    transform: scale(1.1) translate3d(-1.2%, -1%, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
-  .lane-track {
+  .lane-track,
+  .harbour-still {
     animation: none !important;
+    transform: none;
   }
   *,
   *::before,

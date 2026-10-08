@@ -38,45 +38,38 @@ const marks = [
 function Home() {
   return (
     <SiteShell>
-      <section className="relative isolate overflow-hidden bg-harbour text-cream">
-        <img
-          src={publicUrl("media/charlestown-dusk.jpg")}
-          alt=""
-          width={1792}
-          height={1008}
-          className="absolute inset-0 h-full w-full object-cover motion-safe:hidden"
-        />
-        <video
-          className="absolute inset-0 hidden h-full w-full object-cover motion-safe:block"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={publicUrl("media/charlestown-dusk.jpg")}
-          aria-hidden="true"
-        >
-          <source src={publicUrl("media/charlestown-dusk.mp4")} type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-harbour via-harbour/75 to-harbour/25" />
-        <div className="relative mx-auto flex min-h-[34rem] max-w-6xl flex-col justify-end px-4 py-10 sm:min-h-[40rem] sm:px-6 sm:py-14">
-          <p className="text-sm font-medium tracking-wide text-gold">Charlestown, after the light goes.</p>
-          <h1 className="mt-3 max-w-3xl text-5xl leading-none sm:text-7xl">
+      <section className="bg-harbour text-cream">
+        <figure className="relative overflow-hidden">
+          <img
+            src={publicUrl("media/charlestown-dusk.jpg")}
+            alt="Charlestown harbour in the evening, with lit cottages and boats on the water"
+            width={1792}
+            height={1008}
+            className="harbour-still h-80 w-full origin-center object-cover sm:h-[28rem]"
+          />
+          <figcaption className="absolute bottom-4 left-4 bg-harbour px-3 py-2 text-sm text-cream">
+            Charlestown, after the light goes.
+          </figcaption>
+        </figure>
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+          <p className="text-sm font-medium tracking-wide text-gold">St Austell · one cab</p>
+          <h1 className="mt-2 max-w-3xl text-5xl leading-none sm:text-6xl">
             Three seats. The rest of the coast if you book it.
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-cream/90">{BUSINESS.description}</p>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-cream/85">{BUSINESS.description}</p>
           <a
             href={whatsappHref("Hello, I would like to book The Cornish Cab.")}
             target="_blank"
             rel="noreferrer"
-            className="mt-6 flex h-16 max-w-xl items-center justify-center gap-3 rounded-full border-2 border-gold bg-harbour/70 px-5 text-cream"
+            className="mt-6 flex h-16 items-center justify-center gap-3 rounded-full border-2 border-gold px-5 text-cream"
           >
             <span className="font-display text-2xl tracking-wide">WhatsApp {BUSINESS.phoneDisplay}</span>
           </a>
-          <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {marks.map(([title, line]) => (
-              <li key={title} className="border-t border-gold/60 pt-3">
+              <li key={title} className="border-t border-gold/50 pt-3">
                 <p className="font-display text-lg">{title}</p>
-                <p className="mt-1 text-xs text-cream/75">{line}</p>
+                <p className="mt-1 text-xs text-cream/70">{line}</p>
               </li>
             ))}
           </ul>
