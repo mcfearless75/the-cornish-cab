@@ -39,13 +39,13 @@ function Home() {
   return (
     <SiteShell>
       <section className="bg-harbour text-cream">
-        <figure className="relative overflow-hidden">
+        <figure className="harbour-frame relative overflow-hidden">
           <img
             src={publicUrl("media/charlestown-dusk.jpg")}
             alt="Charlestown harbour in the evening, with lit cottages and boats on the water"
             width={1792}
             height={1008}
-            className="harbour-still h-80 w-full origin-center object-cover sm:h-[28rem]"
+            className="harbour-still"
           />
           <figcaption className="absolute bottom-4 left-4 bg-harbour px-3 py-2 text-sm text-cream">
             Charlestown, after the light goes.

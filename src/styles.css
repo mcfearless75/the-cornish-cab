@@ -67,17 +67,33 @@
   }
 }
 
+.harbour-frame {
+  height: 20rem;
+}
+
+@media (min-width: 40rem) {
+  .harbour-frame {
+    height: 28rem;
+  }
+}
+
 .harbour-still {
-  transform: scale(1.06);
-  animation: harbour-drift 28s ease-in-out infinite alternate;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 124%;
+  height: 124%;
+  max-width: none;
+  object-fit: cover;
+  animation: harbour-drift 11s ease-in-out infinite alternate;
 }
 
 @keyframes harbour-drift {
   from {
-    transform: scale(1.06) translate3d(1.2%, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: scale(1.1) translate3d(-1.2%, -1%, 0);
+    transform: translate3d(-16%, -10%, 0);
   }
 }
 
