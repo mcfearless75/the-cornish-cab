@@ -32,7 +32,7 @@ jobs:
           GITHUB_PAGES: "1"
           VITE_PAGES: "1"
           VITE_AUTH_ENABLED: "false"
-          SITE_ORIGIN: https://mcfearless75.github.io/the-cornish-cab
+          SITE_ORIGIN: https://thecornishcab.co.uk
       - uses: actions/upload-pages-artifact@v3
         with:
           path: pages-dist
