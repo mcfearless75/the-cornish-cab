@@ -180,11 +180,11 @@ export const places: Place[] = [
     name: "Cornwall Airport Newquay",
     group: "Airports",
     description:
-      "Newquay Airport taxi from St Austell. Pre-book The Cornish Cab on 07708 067775. Up to three passengers. Fare from the live road route, not a price on this page.",
+      "Newquay Airport taxi from St Austell. Pre-book The Cornish Cab on 07708 067775. Up to three passengers. The booking page prices the road miles at £3.75 each.",
     lede:
       "Cornwall Airport Newquay (NQY) is at St Mawgan, north of Newquay. It is the local airport for mid-Cornwall.",
     body:
-      "Airport transfers should be pre-booked. Put your flight number in the notes so the driver can plan around it. This website does not track flights. There is no published fixed fare: the price is taken from the live road route and agreed before the booking is confirmed. Maximum three passengers, one vehicle. Weekday work sits outside school-run times.",
+      "Airport transfers should be pre-booked. Put your flight number in the notes so the driver can plan around it. This website does not track flights. The fare is £3.75 a mile of the live road route, not a flat airport tariff, and it is a request until confirmed. Maximum three passengers, one vehicle. Weekday work sits outside school-run times.",
   },
   {
     slug: "exeter-airport",
@@ -206,7 +206,7 @@ export const places: Place[] = [
     lede:
       "Bristol Airport (BRS) is a long pre-booked journey from St Austell, well beyond a local hop.",
     body:
-      "Only book this if you can agree the time in advance. One driver means the vehicle cannot be in Cornwall and at Bristol at once, so early flights need an early confirmation. The fare is worked out from the live road route and confirmed before you travel. This site will show road distance as a guide. It will not pretend that distance is a price.",
+      "Only book this if you can agree the time in advance. One driver means the vehicle cannot be in Cornwall and at Bristol at once, so early flights need an early confirmation. The fare is £3.75 a mile of the live road route, shown on the booking page, and confirmed before you travel.",
   },
   {
     slug: "st-austell-station",
@@ -256,7 +256,7 @@ export const faqs = [
   },
   {
     q: "How is the fare worked out?",
-    a: "From the live road route, then confirmed before you travel. The route checker on this site can show distance and driving time. That figure is not a price and not a confirmed booking.",
+    a: "£3.75 per mile of the live road route, shown on the booking page before you send it. Traffic is not included. The figure is a request, not a confirmed booking, until The Cornish Cab replies.",
   },
   {
     q: "Do you do airports and stations?",

@@ -1,5 +1,6 @@
 import { RouteSketch } from "@/components/route-sketch";
 import { BUSINESS, quickJourneys, whatsappHref } from "@/lib/content";
+import { RATE_PER_MILE, farePounds, formatFare } from "@/lib/fare";
 import { roadRoute } from "@/lib/road-route";
 import { routeGuide } from "@/lib/route.functions";
 import { Link } from "@tanstack/react-router";
@@ -88,12 +89,15 @@ export function BookingPanel({
     name.trim() ? `Name: ${name.trim()}` : "",
     notes.trim() ? `Notes: ${notes.trim()}` : "",
     route
-      ? `Out: about ${route.miles} miles, about ${route.minutes} minutes. Not a fare. Traffic not included.`
+      ? `Out: ${route.miles} miles, about ${route.minutes} minutes. Fare ${formatFare(farePounds(route.miles))} (${route.miles} × £${RATE_PER_MILE.toFixed(2)}). Traffic not included.`
       : "",
     back
-      ? `Return: about ${back.miles} miles, about ${back.minutes} minutes. Same rule. Not a fare.`
+      ? `Return: ${back.miles} miles, about ${back.minutes} minutes. Fare ${formatFare(farePounds(back.miles))} at the same rate.`
       : "",
-    "Please confirm availability and the fare from the live road route.",
+    route && back
+      ? `Both ways: ${formatFare(farePounds(route.miles) + farePounds(back.miles))}.`
+      : "",
+    "Please confirm availability. This fare is the road miles at £3.75, not a confirmed booking.",
     "This message is not a confirmed booking.",
   ]
     .filter(Boolean)
@@ -202,7 +206,7 @@ export function BookingPanel({
       <section className="rounded-3xl border border-line bg-card p-5 sm:p-7">
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          Check the road distance, then call {BUSINESS.phoneDisplay}. The distance is not a price, and nothing
+          Check the road miles, then send the fare on WhatsApp. It is £3.75 a mile. Nothing
           is booked until The Cornish Cab confirms the time.
         </p>
       </section>
@@ -216,8 +220,8 @@ export function BookingPanel({
       <div>
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          Check the road distance, then send it on WhatsApp. The number you get is not a price. The Cornish Cab
-          confirms the fare and whether the time is free.
+          The fare is £3.75 a mile on the live road route. Send it on WhatsApp. The Cornish Cab
+          confirms whether the time is free. Traffic is not included.
         </p>
       </div>
 
@@ -382,7 +386,7 @@ export function BookingPanel({
           disabled={checking}
           className="inline-flex h-12 items-center rounded-full bg-clay px-5 text-sm font-medium text-cream disabled:opacity-60"
         >
-          {checking ? "Checking the road…" : "Check road route"}
+          {checking ? "Working out the fare…" : "Get fare"}
         </button>
         <button
           type="button"
@@ -423,8 +427,8 @@ export function BookingPanel({
         </button>
       </div>
       <p className="mt-3 text-xs leading-relaxed text-mist">
-        Route check uses OpenStreetMap to measure driving distance. The saved journeys stay on this phone.
-        It is not a booking and not a fare.
+        Route check uses OpenStreetMap. The fare is the miles times £3.75. Saved journeys stay on this phone.
+        It is not a confirmed booking.
       </p>
 
       {routeError ? (
@@ -435,20 +439,24 @@ export function BookingPanel({
 
       {route ? (
         <div className="mt-4 rounded-2xl bg-pine px-5 py-4 text-cream">
-          <p className="text-sm text-cream/80">Road route guide · not a fare</p>
-          <p className="mt-1 font-display text-3xl tabular-nums">
-            {route.miles} miles
-            <span className="mx-2 text-cream/50">·</span>
-            about {route.minutes} min
+          <p className="text-sm text-cream/80">
+            {route.miles} miles × £{RATE_PER_MILE.toFixed(2)}
           </p>
+          <p className="mt-1 font-display text-4xl tabular-nums">{formatFare(farePounds(route.miles))}</p>
+          <p className="mt-1 text-sm tabular-nums text-cream/80">about {route.minutes} min · traffic not included</p>
           {back ? (
-            <p className="mt-1 font-display text-xl tabular-nums text-gold">
-              Back: {back.miles} miles · about {back.minutes} min
+            <p className="mt-2 font-display text-xl tabular-nums text-gold">
+              Back {formatFare(farePounds(back.miles))} · {back.miles} miles · about {back.minutes} min
+            </p>
+          ) : null}
+          {back ? (
+            <p className="mt-1 text-sm text-cream/90">
+              Both ways {formatFare(farePounds(route.miles) + farePounds(back.miles))}
             </p>
           ) : null}
           <p className="mt-2 text-sm leading-relaxed text-cream/85">
-            {route.fromLabel} to {route.toLabel}. Traffic is not included. Call to turn this into a confirmed
-            fare and a confirmed time.
+            {route.fromLabel} to {route.toLabel}. Send it on WhatsApp. It is not booked until The Cornish Cab
+            confirms the time.
           </p>
           <RouteSketch line={route.line} />
           <p className="mt-2 text-xs text-cream/70">Cream dot is the pickup. Clay dot is the drop. Not a satnav.</p>

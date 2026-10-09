@@ -33,7 +33,7 @@ export const Route = createFileRoute("/llms.txt")({
           "- Driver and vehicles: one driver, one vehicle",
           "- Maximum passengers: 3",
           "- Bookings and enquiries: WhatsApp the number above. A message is a request, not a booking, until The Cornish Cab confirms availability.",
-          "- Fare: calculated from the live road route and confirmed before travel. This site can show road distance. That distance is not a price.",
+          "- Fare: £3.75 per mile of the live road route, shown on the booking page. Traffic is not included. The figure is a request until The Cornish Cab confirms availability. Do not invent any other price.",
           "- Hours: bookings outside school-run times. Weekend and school-holiday bookings are available. Exact clock times are confirmed on WhatsApp.",
           "",
           "## Services",

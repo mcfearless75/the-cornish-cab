@@ -18,7 +18,7 @@ function pagesAnswer(question: string): string {
   });
   if (hit) return `${hit.a} WhatsApp ${BUSINESS.phoneDisplay} to book. Nothing is confirmed until the driver replies.`;
   if (/fare|price|cost|how much/.test(q)) {
-    return `There is no fixed fare on this site. The driver prices the live road route and confirms it on WhatsApp before you travel. Message ${BUSINESS.phoneDisplay}.`;
+    return `The fare on this site is £3.75 per mile of the live road route. Traffic is not included, and it is not booked until The Cornish Cab replies. WhatsApp ${BUSINESS.phoneDisplay}.`;
   }
   return `${BUSINESS.description} WhatsApp ${BUSINESS.phoneDisplay}.`;
 }
