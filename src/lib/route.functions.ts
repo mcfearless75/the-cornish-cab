@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { googleJourney } from "@/lib/places";
 import { locatePlace, readOsrm } from "@/lib/road-route";
 import { getRequestIP } from "@tanstack/react-start/server";
 
@@ -40,6 +41,18 @@ export const routeGuide = createServerFn({ method: "POST" })
     }
     if (!allow(key)) {
       return { ok: false as const, error: "Too many route checks. Call 07708 067775 for the fare." };
+    }
+
+    const journey = await googleJourney(data.from, data.to);
+    if (journey) {
+      return {
+        ok: true as const,
+        miles: journey.miles,
+        minutes: journey.minutes,
+        fromLabel: data.from,
+        toLabel: data.to,
+        line: [] as [number, number][],
+      };
     }
 
     const [fromHit, toHit] = await Promise.all([locatePlace(data.from), locatePlace(data.to)]);

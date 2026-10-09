@@ -101,8 +101,8 @@ export function BookingPanel({
     name.trim() ? `Name: ${name.trim()}` : "",
     notes.trim() ? `Notes: ${notes.trim()}` : "",
     school ? school : "",
-    outFare ? `Fare: ${formatFare(outFare.pounds)} for ${route?.miles} miles.` : "",
-    backFare ? `Return fare: ${formatFare(backFare.pounds)} for ${back?.miles} miles.` : "",
+    outFare ? `Fare: ${formatFare(outFare.pounds)} for ${route?.miles.toFixed(1)} miles.` : "",
+    backFare ? `Return fare: ${formatFare(backFare.pounds)} for ${back?.miles.toFixed(1)} miles.` : "",
     outFare && backFare ? `Both ways: ${formatFare(outFare.pounds + backFare.pounds)}.` : "",
     "I understand this is a booking request and is not confirmed until The Cornish Cab checks availability.",
   ]
@@ -461,11 +461,11 @@ export function BookingPanel({
           <p className="text-sm text-cream/80">Fare</p>
           <p className="mt-1 font-display text-5xl tabular-nums">{formatFare(outFare.pounds)}</p>
           <p className="mt-1 text-sm tabular-nums text-cream/80">
-            {route.miles} miles · about {route.minutes} min · traffic not included
+            {route.miles.toFixed(1)} miles · about {route.minutes} min · traffic not included
           </p>
           {back && backFare ? (
             <p className="mt-2 font-display text-xl tabular-nums text-gold">
-              Back {formatFare(backFare.pounds)} · {back.miles} miles · about {back.minutes} min
+              Back {formatFare(backFare.pounds)} · {back.miles.toFixed(1)} miles · about {back.minutes} min
             </p>
           ) : null}
           {backFare ? (
@@ -476,7 +476,9 @@ export function BookingPanel({
             confirms the time.
           </p>
           <RouteSketch line={route.line} />
-          <p className="mt-2 text-xs text-cream/70">Cream dot is the pickup. Clay dot is the drop. Not a satnav.</p>
+          {route.line.length > 1 ? (
+            <p className="mt-2 text-xs text-cream/70">Cream dot is the pickup. Clay dot is the drop. Not a satnav.</p>
+          ) : null}
         </div>
       ) : null}
 

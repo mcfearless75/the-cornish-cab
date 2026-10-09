@@ -1,4 +1,28 @@
 const SUGGEST_URL = "https://cornish-cab-routing.thecornishcab-143.workers.dev/api/suggest";
+const ROUTE_URL = "https://cornish-cab-routing.thecornishcab-143.workers.dev/api/route";
+
+/** Same road service as the old site. It understands the Google addresses from the suggestion list. */
+export async function googleJourney(origin: string, destination: string): Promise<{ miles: number; minutes: number } | null> {
+  try {
+    const res = await fetch(ROUTE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "User-Agent": "TheCornishCab/1.0",
+      },
+      body: JSON.stringify({ origin, destination }),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as { miles?: unknown; durationSeconds?: unknown };
+    const miles = Number(body.miles);
+    const seconds = Number(body.durationSeconds);
+    if (!Number.isFinite(miles) || miles <= 0) return null;
+    return { miles, minutes: Math.max(1, Math.round((Number.isFinite(seconds) ? seconds : 0) / 60)) };
+  } catch {
+    return null;
+  }
+}
 
 export function inSouthWest(lat: number, lon: number) {
   return lat >= 49.85 && lat <= 51.65 && lon >= -5.95 && lon <= -2.05;
