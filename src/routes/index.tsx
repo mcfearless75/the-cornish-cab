@@ -52,7 +52,10 @@ function Home() {
         </figure>
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <p className="text-sm font-medium tracking-wide text-gold">St Austell · one cab</p>
-          <h1 className="mt-2 max-w-3xl text-5xl leading-none sm:text-6xl">St Austell taxi.</h1>
+          <h1 className="mt-2 max-w-3xl text-5xl leading-[0.9] sm:text-7xl">
+            Where from?
+            <span className="block text-gold">Where to?</span>
+          </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-cream/85">{BUSINESS.description}</p>
           <a
             href={whatsappHref("Hello, I would like to book The Cornish Cab.")}
