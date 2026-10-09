@@ -31,8 +31,7 @@ const calls = [
 const marks = [
   ["Local", "St Austell and the villages"],
   ["One driver", "One vehicle, no fleet"],
-  ["Three seats", "Maximum, including you"],
-  ["Further out", "Airports, stations, coast"],
+  ["Further out", "Airports and stations"],
 ];
 
 function Home() {
@@ -53,9 +52,7 @@ function Home() {
         </figure>
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
           <p className="text-sm font-medium tracking-wide text-gold">St Austell · one cab</p>
-          <h1 className="mt-2 max-w-3xl text-5xl leading-none sm:text-6xl">
-            Three seats. The rest of the coast if you book it.
-          </h1>
+          <h1 className="mt-2 max-w-3xl text-5xl leading-none sm:text-6xl">St Austell taxi.</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-cream/85">{BUSINESS.description}</p>
           <a
             href={whatsappHref("Hello, I would like to book The Cornish Cab.")}
@@ -65,7 +62,7 @@ function Home() {
           >
             <span className="font-display text-2xl tracking-wide">WhatsApp {BUSINESS.phoneDisplay}</span>
           </a>
-          <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <ul className="mt-6 grid grid-cols-3 gap-3">
             {marks.map(([title, line]) => (
               <li key={title} className="border-t border-gold/50 pt-3">
                 <p className="font-display text-lg">{title}</p>
