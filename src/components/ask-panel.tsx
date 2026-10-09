@@ -18,7 +18,7 @@ function pagesAnswer(question: string): string {
   });
   if (hit) return `${hit.a} WhatsApp ${BUSINESS.phoneDisplay} to book. Nothing is confirmed until the driver replies.`;
   if (/fare|price|cost|how much/.test(q)) {
-    return `The fare on this site is £3.75 per mile of the live road route. Traffic is not included, and it is not booked until The Cornish Cab replies. WhatsApp ${BUSINESS.phoneDisplay}.`;
+    return `The fare is £3.75 per mile of the live road route, rounded up to the next pound, plus £10 if the pickup is more than 10 miles from St Austell. It is not booked until The Cornish Cab replies. WhatsApp ${BUSINESS.phoneDisplay}.`;
   }
   return `${BUSINESS.description} WhatsApp ${BUSINESS.phoneDisplay}.`;
 }

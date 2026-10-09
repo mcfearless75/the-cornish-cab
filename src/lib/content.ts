@@ -252,11 +252,11 @@ export const faqs = [
   },
   {
     q: "Do you run during the school run?",
-    a: "Bookings are taken outside school-run times. Weekend and school-holiday bookings are available. The exact window on a school day is confirmed when you call — this site does not publish a clock time the old listing did not state.",
+    a: "Bookings are taken outside the school run: 7:30–9:15am and 2:00–4:00pm on weekdays in term time. Weekends and school holidays are available.",
   },
   {
     q: "How is the fare worked out?",
-    a: "£3.75 per mile of the live road route, shown on the booking page before you send it. Traffic is not included. The figure is a request, not a confirmed booking, until The Cornish Cab replies.",
+    a: "£3.75 per mile of the live road route, rounded up to the next pound. £10 is added if the pickup is more than 10 miles from St Austell. Traffic is not included. The figure is a request, not a confirmed booking, until The Cornish Cab replies.",
   },
   {
     q: "Do you do airports and stations?",

@@ -1,6 +1,6 @@
 import { RouteSketch } from "@/components/route-sketch";
 import { BUSINESS, quickJourneys, whatsappHref } from "@/lib/content";
-import { RATE_PER_MILE, farePounds, formatFare } from "@/lib/fare";
+import { BASE, formatFare, quoteFare, schoolRunBlock } from "@/lib/fare";
 import { roadRoute } from "@/lib/road-route";
 import { routeGuide } from "@/lib/route.functions";
 import { Link } from "@tanstack/react-router";
@@ -57,6 +57,8 @@ export function BookingPanel({
   const [notes, setNotes] = useState("");
   const [route, setRoute] = useState<RouteResult | null>(null);
   const [back, setBack] = useState<RouteResult | null>(null);
+  const [fromBase, setFromBase] = useState<number | null>(null);
+  const [toBase, setToBase] = useState<number | null>(null);
   const [returning, setReturning] = useState(false);
   const [saved, setSaved] = useState<SavedJourney[]>([]);
   const [routeError, setRouteError] = useState("");
@@ -79,26 +81,28 @@ export function BookingPanel({
   }, [initialFrom, initialTo, initialWhen]);
 
   const whenLabel = asap ? "As soon as possible" : when || "Time to be agreed";
+  const school = schoolRunBlock(asap, when);
+  const outFare = route ? quoteFare(route.miles, fromBase) : null;
+  const backFare = back ? quoteFare(back.miles, toBase) : null;
 
   const message = [
-    "The Cornish Cab — booking request",
+    "Hello The Cornish Cab, I would like to request a taxi booking.",
+    "",
     `Pickup: ${from.trim() || "—"}`,
     `Destination: ${to.trim() || "—"}`,
     `When: ${whenLabel}`,
     `Passengers: ${passengers} (maximum 3)`,
     name.trim() ? `Name: ${name.trim()}` : "",
     notes.trim() ? `Notes: ${notes.trim()}` : "",
-    route
-      ? `Out: ${route.miles} miles, about ${route.minutes} minutes. Fare ${formatFare(farePounds(route.miles))} (${route.miles} × £${RATE_PER_MILE.toFixed(2)}). Traffic not included.`
+    school ? school : "",
+    outFare
+      ? `Out: ${route?.miles} miles. Fare ${formatFare(outFare.pounds)}${outFare.surcharge ? " (includes £10, pickup is over 10 miles from St Austell)" : ""}.`
       : "",
-    back
-      ? `Return: ${back.miles} miles, about ${back.minutes} minutes. Fare ${formatFare(farePounds(back.miles))} at the same rate.`
+    backFare
+      ? `Return: ${back?.miles} miles. Fare ${formatFare(backFare.pounds)}${backFare.surcharge ? " (includes £10, that pickup is over 10 miles from St Austell)" : ""}.`
       : "",
-    route && back
-      ? `Both ways: ${formatFare(farePounds(route.miles) + farePounds(back.miles))}.`
-      : "",
-    "Please confirm availability. This fare is the road miles at £3.75, not a confirmed booking.",
-    "This message is not a confirmed booking.",
+    outFare && backFare ? `Both ways: ${formatFare(outFare.pounds + backFare.pounds)}.` : "",
+    "I understand this is a booking request and is not confirmed until The Cornish Cab checks availability.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -115,23 +119,39 @@ export function BookingPanel({
     setSaved(next);
   }
 
-  async function checkRoute() {
-    setRouteError("");
+  function clearQuote() {
     setRoute(null);
     setBack(null);
+    setFromBase(null);
+    setToBase(null);
+  }
+
+  async function checkRoute() {
+    setRouteError("");
+    clearQuote();
+    const blocked = schoolRunBlock(asap, when);
+    if (blocked) {
+      setRouteError(blocked);
+      return;
+    }
     setChecking(true);
     try {
-      const result = await lookup(from, to);
+      const [result, baseLeg] = await Promise.all([lookup(from, to), lookup(BASE, from)]);
       if (!result.ok) {
         setRouteError(result.error);
         return;
       }
       setRoute(result);
+      setFromBase(baseLeg.ok ? baseLeg.miles : null);
       remember(from.trim(), to.trim());
       if (returning) {
-        const home = await lookup(to, from);
-        if (home.ok) setBack(home);
-        else setRouteError(`Outward route is above. The return could not be measured: ${home.error}`);
+        const [home, returnBase] = await Promise.all([lookup(to, from), lookup(BASE, to)]);
+        if (home.ok) {
+          setBack(home);
+          setToBase(returnBase.ok ? returnBase.miles : null);
+        } else {
+          setRouteError(`Outward route is above. The return could not be measured: ${home.error}`);
+        }
       }
     } catch (error) {
       setRouteError(error instanceof Error ? error.message : "The route check failed.");
@@ -145,6 +165,8 @@ export function BookingPanel({
     setTo(from);
     setRoute(null);
     setBack(null);
+    setFromBase(null);
+    setToBase(null);
   }
 
   function addNote(chip: string) {
@@ -206,8 +228,9 @@ export function BookingPanel({
       <section className="rounded-3xl border border-line bg-card p-5 sm:p-7">
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          Check the road miles, then send the fare on WhatsApp. It is £3.75 a mile. Nothing
-          is booked until The Cornish Cab confirms the time.
+          Check the road miles, then send the fare on WhatsApp. £3.75 a mile, rounded up to the next
+          pound, plus £10 if the pickup is more than 10 miles from St Austell. Nothing is booked until the time
+          is confirmed.
         </p>
       </section>
     );
@@ -220,8 +243,8 @@ export function BookingPanel({
       <div>
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          The fare is £3.75 a mile on the live road route. Send it on WhatsApp. The Cornish Cab
-          confirms whether the time is free. Traffic is not included.
+          The fare is £3.75 a mile, rounded up to the next pound. £10 is added when the pickup is more
+          than 10 miles from St Austell. Send it on WhatsApp. Nothing is booked until the time is confirmed.
         </p>
       </div>
 
@@ -237,8 +260,7 @@ export function BookingPanel({
             onClick={() => {
               setFrom(journey.from);
               setTo(journey.to);
-              setRoute(null);
-              setBack(null);
+              clearQuote();
             }}
           >
             {journey.from} → {journey.to}
@@ -252,8 +274,7 @@ export function BookingPanel({
             onClick={() => {
               setFrom(j.from);
               setTo(j.to);
-              setRoute(null);
-              setBack(null);
+              clearQuote();
             }}
           >
             {j.from} → {j.to}
@@ -427,8 +448,8 @@ export function BookingPanel({
         </button>
       </div>
       <p className="mt-3 text-xs leading-relaxed text-mist">
-        Route check uses OpenStreetMap. The fare is the miles times £3.75. Saved journeys stay on this phone.
-        It is not a confirmed booking.
+        Route check uses OpenStreetMap. The fare matches the previous calculator: £3.75 a mile, rounded up,
+        plus £10 if that pickup is over 10 miles from St Austell. It is not a confirmed booking.
       </p>
 
       {routeError ? (
@@ -437,22 +458,26 @@ export function BookingPanel({
         </p>
       ) : null}
 
-      {route ? (
+      {outFare && route ? (
         <div className="mt-4 rounded-2xl bg-pine px-5 py-4 text-cream">
           <p className="text-sm text-cream/80">
-            {route.miles} miles × £{RATE_PER_MILE.toFixed(2)}
+            {route.miles} miles × £3.75, rounded up to {formatFare(outFare.journey)}
+            {outFare.surcharge
+              ? `. Pickup is ${fromBase} miles from St Austell, so £10 is added`
+              : fromBase == null
+                ? ". Distance from St Austell could not be checked, so the £10 is not included"
+                : ""}
           </p>
-          <p className="mt-1 font-display text-4xl tabular-nums">{formatFare(farePounds(route.miles))}</p>
+          <p className="mt-1 font-display text-4xl tabular-nums">{formatFare(outFare.pounds)}</p>
           <p className="mt-1 text-sm tabular-nums text-cream/80">about {route.minutes} min · traffic not included</p>
-          {back ? (
+          {back && backFare ? (
             <p className="mt-2 font-display text-xl tabular-nums text-gold">
-              Back {formatFare(farePounds(back.miles))} · {back.miles} miles · about {back.minutes} min
+              Back {formatFare(backFare.pounds)} · {back.miles} miles
+              {backFare.surcharge ? " · includes £10" : ""}
             </p>
           ) : null}
-          {back ? (
-            <p className="mt-1 text-sm text-cream/90">
-              Both ways {formatFare(farePounds(route.miles) + farePounds(back.miles))}
-            </p>
+          {backFare ? (
+            <p className="mt-1 text-sm text-cream/90">Both ways {formatFare(outFare.pounds + backFare.pounds)}</p>
           ) : null}
           <p className="mt-2 text-sm leading-relaxed text-cream/85">
             {route.fromLabel} to {route.toLabel}. Send it on WhatsApp. It is not booked until The Cornish Cab
