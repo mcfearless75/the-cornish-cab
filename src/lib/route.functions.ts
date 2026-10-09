@@ -1,81 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
-import { clarifyPlace, inSouthWest, preferSouthWest } from "@/lib/places";
-import { readOsrm } from "@/lib/road-route";
+import { locatePlace, readOsrm } from "@/lib/road-route";
 import { getRequestIP } from "@tanstack/react-start/server";
 
-type Hit = { lat: number; lon: number; label: string };
-
-const geoCache = new Map<string, Hit | null>();
 const routeHits = new Map<string, number[]>();
-let lastGeo = 0;
 
 function allow(key: string): boolean {
   const now = Date.now();
   const fresh = (routeHits.get(key) ?? []).filter((t) => now - t < 60_000);
-  if (fresh.length >= 8) {
+  if (fresh.length >= 24) {
     routeHits.set(key, fresh);
     return false;
   }
   fresh.push(now);
   routeHits.set(key, fresh);
   return true;
-}
-
-async function waitTurn() {
-  const wait = 1100 - (Date.now() - lastGeo);
-  if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
-  lastGeo = Date.now();
-}
-
-async function searchPlaces(query: string): Promise<Hit[]> {
-  const key = query.toLowerCase();
-  if (geoCache.has(key)) {
-    const cached = geoCache.get(key);
-    return cached ? [cached] : [];
-  }
-  await waitTurn();
-  const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("q", query);
-  url.searchParams.set("format", "jsonv2");
-  url.searchParams.set("limit", "5");
-  url.searchParams.set("countrycodes", "gb");
-  const res = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "TheCornishCab/1.0 (road-route guide for bookings)",
-    },
-  });
-  if (!res.ok) return [];
-  const rows = (await res.json()) as { lat?: string; lon?: string; display_name?: string }[];
-  const hits = rows.flatMap((hit) => {
-    const lat = Number(hit.lat);
-    const lon = Number(hit.lon);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return [];
-    return [
-      {
-        lat,
-        lon,
-        label: (hit.display_name ?? query).split(",").slice(0, 3).join(", "),
-      },
-    ];
-  });
-  const chosen = preferSouthWest(hits);
-  geoCache.set(key, chosen);
-  return hits;
-}
-
-async function geocode(query: string): Promise<Hit | null> {
-  const direct = await searchPlaces(query);
-  const nearby = direct.find((hit) => inSouthWest(hit.lat, hit.lon));
-  if (nearby) return nearby;
-  let fallback = direct[0] ?? null;
-  for (const attempt of (await clarifyPlace(query)).slice(1)) {
-    const hits = await searchPlaces(attempt);
-    const local = hits.find((hit) => inSouthWest(hit.lat, hit.lon));
-    if (local) return local;
-    fallback ??= hits[0] ?? null;
-  }
-  return fallback;
 }
 
 export const routeGuide = createServerFn({ method: "POST" })
@@ -104,8 +42,7 @@ export const routeGuide = createServerFn({ method: "POST" })
       return { ok: false as const, error: "Too many route checks. Call 07708 067775 for the fare." };
     }
 
-    const fromHit = await geocode(data.from);
-    const toHit = await geocode(data.to);
+    const [fromHit, toHit] = await Promise.all([locatePlace(data.from), locatePlace(data.to)]);
     if (!fromHit || !toHit) {
       return {
         ok: false as const,

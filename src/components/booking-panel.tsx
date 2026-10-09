@@ -73,6 +73,11 @@ export function BookingPanel({
   }, []);
 
   useEffect(() => {
+    if (!route && !routeError) return;
+    document.getElementById("fare-result")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [route, routeError]);
+
+  useEffect(() => {
     setFrom(initialFrom);
     setTo(initialTo);
     if (initialWhen && initialWhen !== "ASAP") {
@@ -96,12 +101,8 @@ export function BookingPanel({
     name.trim() ? `Name: ${name.trim()}` : "",
     notes.trim() ? `Notes: ${notes.trim()}` : "",
     school ? school : "",
-    outFare
-      ? `Out: ${route?.miles} miles. Fare ${formatFare(outFare.pounds)}${outFare.surcharge ? " (includes £10, pickup is over 10 miles from St Austell)" : ""}.`
-      : "",
-    backFare
-      ? `Return: ${back?.miles} miles. Fare ${formatFare(backFare.pounds)}${backFare.surcharge ? " (includes £10, that pickup is over 10 miles from St Austell)" : ""}.`
-      : "",
+    outFare ? `Fare: ${formatFare(outFare.pounds)} for ${route?.miles} miles.` : "",
+    backFare ? `Return fare: ${formatFare(backFare.pounds)} for ${back?.miles} miles.` : "",
     outFare && backFare ? `Both ways: ${formatFare(outFare.pounds + backFare.pounds)}.` : "",
     "I understand this is a booking request and is not confirmed until The Cornish Cab checks availability.",
   ]
@@ -109,9 +110,14 @@ export function BookingPanel({
     .join("\n");
 
   async function lookup(pickup: string, drop: string) {
-    return import.meta.env.VITE_PAGES === "1"
-      ? roadRoute(pickup, drop)
-      : routeGuide({ data: { from: pickup, to: drop } });
+    if (import.meta.env.VITE_PAGES === "1") return roadRoute(pickup, drop);
+    try {
+      const result = await routeGuide({ data: { from: pickup, to: drop } });
+      if (result.ok || result.error.includes("Too many")) return result;
+    } catch {
+      // The server check can time out. Measure it in the browser instead.
+    }
+    return roadRoute(pickup, drop);
   }
 
   function remember(pickup: string, drop: string) {
@@ -229,8 +235,7 @@ export function BookingPanel({
       <section className="rounded-3xl border border-line bg-card p-5 sm:p-7">
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          Check the road miles, then send the fare on WhatsApp. £3.75 a mile, rounded up to the next
-          pound, plus £10 if the pickup is more than 10 miles from St Austell. Nothing is booked until the time
+          Press Get fare for the price of this journey, then send it on WhatsApp. Nothing is booked until the time
           is confirmed.
         </p>
       </section>
@@ -244,8 +249,7 @@ export function BookingPanel({
       <div>
         <h2 className="text-3xl text-ink">{heading}</h2>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-mist">
-          The fare is £3.75 a mile, rounded up to the next pound. £10 is added when the pickup is more
-          than 10 miles from St Austell. Send it on WhatsApp. Nothing is booked until the time is confirmed.
+          Press Get fare for the price, then send it on WhatsApp. Nothing is booked until the time is confirmed.
         </p>
       </div>
 
@@ -446,33 +450,22 @@ export function BookingPanel({
           Share
         </button>
       </div>
-      <p className="mt-3 text-xs leading-relaxed text-mist">
-        Route check uses OpenStreetMap. The fare matches the previous calculator: £3.75 a mile, rounded up,
-        plus £10 if that pickup is over 10 miles from St Austell. It is not a confirmed booking.
-      </p>
-
       {routeError ? (
-        <p className="mt-4 rounded-xl border border-line bg-cream px-4 py-3 text-sm text-ink" role="alert">
+        <p id="fare-result" className="mt-4 rounded-xl border border-line bg-cream px-4 py-3 text-sm text-ink" role="alert">
           {routeError}
         </p>
       ) : null}
 
       {outFare && route ? (
-        <div className="mt-4 rounded-2xl bg-pine px-5 py-4 text-cream">
-          <p className="text-sm text-cream/80">
-            {route.miles} miles × £3.75, rounded up to {formatFare(outFare.journey)}
-            {outFare.surcharge
-              ? `. Pickup is ${fromBase} miles from St Austell, so £10 is added`
-              : fromBase == null
-                ? ". Distance from St Austell could not be checked, so the £10 is not included"
-                : ""}
+        <div id="fare-result" className="mt-4 rounded-2xl bg-pine px-5 py-4 text-cream">
+          <p className="text-sm text-cream/80">Fare</p>
+          <p className="mt-1 font-display text-5xl tabular-nums">{formatFare(outFare.pounds)}</p>
+          <p className="mt-1 text-sm tabular-nums text-cream/80">
+            {route.miles} miles · about {route.minutes} min · traffic not included
           </p>
-          <p className="mt-1 font-display text-4xl tabular-nums">{formatFare(outFare.pounds)}</p>
-          <p className="mt-1 text-sm tabular-nums text-cream/80">about {route.minutes} min · traffic not included</p>
           {back && backFare ? (
             <p className="mt-2 font-display text-xl tabular-nums text-gold">
-              Back {formatFare(backFare.pounds)} · {back.miles} miles
-              {backFare.surcharge ? " · includes £10" : ""}
+              Back {formatFare(backFare.pounds)} · {back.miles} miles · about {back.minutes} min
             </p>
           ) : null}
           {backFare ? (
@@ -486,6 +479,10 @@ export function BookingPanel({
           <p className="mt-2 text-xs text-cream/70">Cream dot is the pickup. Clay dot is the drop. Not a satnav.</p>
         </div>
       ) : null}
+
+      <p className="mt-3 text-xs leading-relaxed text-mist">
+        The figure appears after Get fare. It is not a confirmed booking.
+      </p>
 
       <div className="mt-5 rounded-2xl border border-dashed border-line bg-cream p-4">
         <div className="flex items-center justify-between gap-3">

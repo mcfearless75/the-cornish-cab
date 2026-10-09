@@ -33,7 +33,7 @@ export const Route = createFileRoute("/llms.txt")({
           "- Driver and vehicles: one driver, one vehicle",
           "- Maximum passengers: 3",
           "- Bookings and enquiries: WhatsApp the number above. A message is a request, not a booking, until The Cornish Cab confirms availability.",
-          "- Fare: £3.75 per mile of the live road route, rounded up to the next pound. Add £10 if the pickup is more than 10 miles from St Austell. Traffic is not included. The figure is a request until The Cornish Cab confirms availability. Do not invent any other price.",
+          "- Fare: shown after Get fare on the booking page, from the live road route. Do not quote a per-mile rate or a surcharge. Traffic is not included. The figure is a request until The Cornish Cab confirms availability.",
           "- Hours: no bookings 7:30–9:15am or 2:00–4:00pm on weekdays during school term. Weekends and school holidays are available.",
           "",
           "## Services",

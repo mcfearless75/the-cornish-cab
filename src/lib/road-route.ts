@@ -62,8 +62,8 @@ export async function roadRoute(from: string, to: string): Promise<RoadRoute> {
   if (pickup.length < 3 || drop.length < 3 || pickup.length > 140 || drop.length > 140) {
     return { ok: false, error: "Use a place name for both ends, under 140 characters." };
   }
-  const fromHit = await geocode(pickup);
-  const toHit = await geocode(drop);
+  const fromHit = await locatePlace(pickup);
+  const toHit = await locatePlace(drop);
   if (!fromHit || !toHit) {
     return {
       ok: false,
@@ -79,7 +79,7 @@ export async function roadRoute(from: string, to: string): Promise<RoadRoute> {
   return readOsrm(body, fromHit.label, toHit.label);
 }
 
-async function geocode(query: string): Promise<Hit | null> {
+export async function locatePlace(query: string): Promise<Hit | null> {
   const url = new URL("https://photon.komoot.io/api/");
   url.searchParams.set("q", query);
   url.searchParams.set("limit", "5");
