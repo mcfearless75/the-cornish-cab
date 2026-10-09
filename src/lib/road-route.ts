@@ -1,3 +1,5 @@
+import { preferSouthWest } from "@/lib/places";
+
 export type RoadRoute =
   | {
       ok: true;
@@ -80,7 +82,7 @@ export async function roadRoute(from: string, to: string): Promise<RoadRoute> {
 async function geocode(query: string): Promise<Hit | null> {
   const url = new URL("https://photon.komoot.io/api/");
   url.searchParams.set("q", query);
-  url.searchParams.set("limit", "1");
+  url.searchParams.set("limit", "5");
   url.searchParams.set("lat", "50.34");
   url.searchParams.set("lon", "-4.79");
   const res = await fetch(url);
@@ -88,13 +90,15 @@ async function geocode(query: string): Promise<Hit | null> {
   const body = (await res.json()) as {
     features?: {
       geometry?: { coordinates?: number[] };
-      properties?: { name?: string; city?: string; state?: string };
+      properties?: { name?: string; city?: string; county?: string; state?: string };
     }[];
   };
-  const feature = body.features?.[0];
-  const [lon, lat] = feature?.geometry?.coordinates ?? [];
-  if (typeof lat !== "number" || typeof lon !== "number") return null;
-  const props = feature?.properties;
-  const label = [props?.name, props?.city, props?.state].filter(Boolean).join(", ") || query;
-  return { lat, lon, label };
+  const hits = (body.features ?? []).flatMap((feature) => {
+    const [lon, lat] = feature.geometry?.coordinates ?? [];
+    if (typeof lat !== "number" || typeof lon !== "number") return [];
+    const props = feature.properties;
+    const label = [props?.name, props?.city || props?.county, props?.state].filter(Boolean).join(", ") || query;
+    return [{ lat, lon, label }];
+  });
+  return preferSouthWest(hits);
 }

@@ -1,3 +1,4 @@
+import { PlaceField } from "@/components/place-field";
 import { RouteSketch } from "@/components/route-sketch";
 import { BUSINESS, quickJourneys, whatsappHref } from "@/lib/content";
 import { BASE, formatFare, quoteFare, schoolRunBlock } from "@/lib/fare";
@@ -88,8 +89,8 @@ export function BookingPanel({
   const message = [
     "Hello The Cornish Cab, I would like to request a taxi booking.",
     "",
-    `Pickup: ${from.trim() || "—"}`,
-    `Destination: ${to.trim() || "—"}`,
+    `Pickup: ${route?.fromLabel || from.trim() || "—"}`,
+    `Destination: ${route?.toLabel || to.trim() || "—"}`,
     `When: ${whenLabel}`,
     `Passengers: ${passengers} (maximum 3)`,
     name.trim() ? `Name: ${name.trim()}` : "",
@@ -283,26 +284,24 @@ export function BookingPanel({
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-1.5 text-sm font-medium">
-          Pickup
-          <input
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            className="h-12 rounded-xl border border-line bg-cream px-3 font-normal text-ink"
-            placeholder="St Austell railway station"
-            autoComplete="off"
-          />
-        </label>
-        <label className="grid gap-1.5 text-sm font-medium">
-          Destination
-          <input
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className="h-12 rounded-xl border border-line bg-cream px-3 font-normal text-ink"
-            placeholder="Mevagissey harbour"
-            autoComplete="off"
-          />
-        </label>
+        <PlaceField
+          label="Pickup"
+          value={from}
+          onChange={(next) => {
+            setFrom(next);
+            clearQuote();
+          }}
+          placeholder="St Austell railway station"
+        />
+        <PlaceField
+          label="Destination"
+          value={to}
+          onChange={(next) => {
+            setTo(next);
+            clearQuote();
+          }}
+          placeholder="Mevagissey harbour"
+        />
         <fieldset className="grid gap-2">
           <legend className="text-sm font-medium">When</legend>
           <div className="flex flex-wrap gap-2">

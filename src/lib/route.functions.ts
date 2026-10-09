@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { clarifyPlace, inSouthWest, preferSouthWest } from "@/lib/places";
 import { readOsrm } from "@/lib/road-route";
 import { getRequestIP } from "@tanstack/react-start/server";
 
@@ -26,38 +27,55 @@ async function waitTurn() {
   lastGeo = Date.now();
 }
 
-async function geocode(query: string): Promise<Hit | null> {
+async function searchPlaces(query: string): Promise<Hit[]> {
   const key = query.toLowerCase();
-  if (geoCache.has(key)) return geoCache.get(key) ?? null;
+  if (geoCache.has(key)) {
+    const cached = geoCache.get(key);
+    return cached ? [cached] : [];
+  }
   await waitTurn();
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("q", query);
   url.searchParams.set("format", "jsonv2");
-  url.searchParams.set("limit", "1");
+  url.searchParams.set("limit", "5");
   url.searchParams.set("countrycodes", "gb");
-  url.searchParams.set("viewbox", "-5.8,51.6,-2.2,49.9");
-  url.searchParams.set("bounded", "0");
   const res = await fetch(url, {
     headers: {
       Accept: "application/json",
       "User-Agent": "TheCornishCab/1.0 (road-route guide for bookings)",
     },
   });
-  if (!res.ok) return null;
+  if (!res.ok) return [];
   const rows = (await res.json()) as { lat?: string; lon?: string; display_name?: string }[];
-  const hit = rows[0];
-  if (!hit?.lat || !hit.lon) {
-    geoCache.set(key, null);
-    return null;
+  const hits = rows.flatMap((hit) => {
+    const lat = Number(hit.lat);
+    const lon = Number(hit.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return [];
+    return [
+      {
+        lat,
+        lon,
+        label: (hit.display_name ?? query).split(",").slice(0, 3).join(", "),
+      },
+    ];
+  });
+  const chosen = preferSouthWest(hits);
+  geoCache.set(key, chosen);
+  return hits;
+}
+
+async function geocode(query: string): Promise<Hit | null> {
+  const direct = await searchPlaces(query);
+  const nearby = direct.find((hit) => inSouthWest(hit.lat, hit.lon));
+  if (nearby) return nearby;
+  let fallback = direct[0] ?? null;
+  for (const attempt of (await clarifyPlace(query)).slice(1)) {
+    const hits = await searchPlaces(attempt);
+    const local = hits.find((hit) => inSouthWest(hit.lat, hit.lon));
+    if (local) return local;
+    fallback ??= hits[0] ?? null;
   }
-  const parsed: Hit = {
-    lat: Number(hit.lat),
-    lon: Number(hit.lon),
-    label: (hit.display_name ?? query).split(",").slice(0, 3).join(", "),
-  };
-  if (!Number.isFinite(parsed.lat) || !Number.isFinite(parsed.lon)) return null;
-  geoCache.set(key, parsed);
-  return parsed;
+  return fallback;
 }
 
 export const routeGuide = createServerFn({ method: "POST" })
