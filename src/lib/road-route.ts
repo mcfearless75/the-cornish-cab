@@ -1,4 +1,4 @@
-import { preferSouthWest } from "@/lib/places";
+import { inSouthWest, placeAttempts, preferSouthWest } from "@/lib/places";
 
 export type RoadRoute =
   | {
@@ -67,7 +67,7 @@ export async function roadRoute(from: string, to: string): Promise<RoadRoute> {
   if (!fromHit || !toHit) {
     return {
       ok: false,
-      error: "Those places could not be found on the map. Call 07708 067775 and read the addresses out.",
+      error: "The map did not recognise one of those addresses. Pick a suggestion, or try the street and the town, then press Get fare again.",
     };
   }
   const url = `https://router.project-osrm.org/route/v1/driving/${fromHit.lon},${fromHit.lat};${toHit.lon},${toHit.lat}?overview=simplified&geometries=geojson`;
@@ -80,25 +80,34 @@ export async function roadRoute(from: string, to: string): Promise<RoadRoute> {
 }
 
 export async function locatePlace(query: string): Promise<Hit | null> {
+  for (const attempt of placeAttempts(query)) {
+    const hits = (await photon(attempt)).filter((hit) => inSouthWest(hit.lat, hit.lon));
+    const chosen = preferSouthWest(hits);
+    if (chosen) return chosen;
+  }
+  return null;
+}
+
+async function photon(query: string): Promise<Hit[]> {
   const url = new URL("https://photon.komoot.io/api/");
   url.searchParams.set("q", query);
   url.searchParams.set("limit", "5");
   url.searchParams.set("lat", "50.34");
   url.searchParams.set("lon", "-4.79");
+  url.searchParams.set("bbox", "-5.95,49.85,-2.05,51.65");
   const res = await fetch(url);
-  if (!res.ok) return null;
+  if (!res.ok) return [];
   const body = (await res.json()) as {
     features?: {
       geometry?: { coordinates?: number[] };
-      properties?: { name?: string; city?: string; county?: string; state?: string };
+      properties?: { name?: string; street?: string; city?: string; county?: string; state?: string };
     }[];
   };
-  const hits = (body.features ?? []).flatMap((feature) => {
+  return (body.features ?? []).flatMap((feature) => {
     const [lon, lat] = feature.geometry?.coordinates ?? [];
     if (typeof lat !== "number" || typeof lon !== "number") return [];
     const props = feature.properties;
-    const label = [props?.name, props?.city || props?.county, props?.state].filter(Boolean).join(", ") || query;
+    const label = [props?.name, props?.street, props?.city || props?.county].filter(Boolean).join(", ") || query;
     return [{ lat, lon, label }];
   });
-  return preferSouthWest(hits);
 }

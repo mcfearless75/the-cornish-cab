@@ -46,7 +46,7 @@ export const routeGuide = createServerFn({ method: "POST" })
     if (!fromHit || !toHit) {
       return {
         ok: false as const,
-        error: "Those places could not be found on the map. Call 07708 067775 and read the addresses out.",
+        error: "The map did not recognise one of those addresses. Pick a suggestion, or try the street and the town, then press Get fare again.",
       };
     }
 

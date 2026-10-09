@@ -73,3 +73,30 @@ export async function clarifyPlace(query: string): Promise<string[]> {
   if (primary && !attempts.some((item) => item.toLowerCase() === primary.toLowerCase())) attempts.push(`${primary}, Cornwall`);
   return attempts;
 }
+
+export function placeAttempts(query: string): string[] {
+  const parts = query
+    .split(",")
+    .map((part) => part.replace(/\bhotel\b/gi, "").replace(/\s+/g, " ").trim())
+    .filter((part) => part && !/^(uk|united kingdom)$/i.test(part));
+  const attempts: string[] = [];
+  const add = (value: string) => {
+    const text = value.replace(/\s+/g, " ").trim();
+    if (text.length < 3 || attempts.some((item) => item.toLowerCase() === text.toLowerCase())) return;
+    attempts.push(text);
+  };
+  add(parts.join(", "));
+  const name = parts[0] ?? "";
+  const town = parts[parts.length - 1] ?? "";
+  if (parts.length >= 3) {
+    const brand = name.split(/\s+/).slice(0, 2).join(" ");
+    for (let i = 1; i < parts.length - 1; i++) {
+      add(`${name}, ${parts[i]}`);
+      add(`${brand} ${parts[i]}`);
+    }
+    add(`${parts[1]}, ${town}`);
+  }
+  if (name && town && name.toLowerCase() !== town.toLowerCase()) add(`${name}, ${town}`);
+  add(name);
+  return attempts;
+}
